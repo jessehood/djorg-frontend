@@ -1,29 +1,32 @@
 import React, { Component } from 'react';
 import NotesForm from './NotesForm';
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
+const GET_NOTES = gql`
+  {
+    notes {
+      title
+      content
+    }
+  }
+`;
 
 class Notes extends Component {
-  state = {
-    notes: [{}]
-  }
-  
-  renderNotes() {
-    return this.state.notes.map(note => (
-      <div>
-        <h1>{note.title}</h1>
-        <p>{note.content}</p>
-      </div>
-    ));
-  }
-
   render() {
+    const { data } = this.props;
+    if (data.loading || !data.notes) return <div>Loading...</div>;
+    console.log(data);
     return (
       <div>
-        <h1>Add a note</h1>
-        <NotesForm />
-        <div>{this.renderNotes()}</div>
+        {data.notes.map(note => (
+          <div class="note">
+            <div>{note.title}</div>
+            <div>{note.content}</div>
+          </div>
+        ))}
       </div>
-    )
+    );
   }
 }
 
-export default Notes;
+export default graphql(GET_NOTES)(Notes);
